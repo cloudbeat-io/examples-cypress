@@ -52,22 +52,18 @@ context('Cypress.Cookies', () => {
     cy.setCookie('fakeCookie', '123ABC')
   })
 
-  it('.preserveOnce() - preserve cookies by key', () => {
+  it('cy.session() - preserve cookies across tests using a named session', () => {
     // normally cookies are reset after each test
     cy.getCookie('fakeCookie').should('not.be.ok')
 
-    // preserving a cookie will not clear it when
-    // the next test starts
-    cy.setCookie('lastCookie', '789XYZ')
-    Cypress.Cookies.preserveOnce('lastCookie')
-  })
-
-  it('.defaults() - set defaults for all cookies', () => {
-    // now any cookie with the name 'session_id' will
-    // not be cleared before each new test runs
-    Cypress.Cookies.defaults({
-      preserve: 'session_id',
+    // Cypress.Cookies.preserveOnce()/.defaults() were removed in Cypress 12.0.0;
+    // cy.session() is the replacement for persisting state (cookies, local storage)
+    // across tests under a named session
+    // https://on.cypress.io/session
+    cy.session('lastCookie-session', () => {
+      cy.setCookie('lastCookie', '789XYZ')
     })
+    cy.getCookie('lastCookie').should('have.property', 'value', '789XYZ')
   })
 })
 
